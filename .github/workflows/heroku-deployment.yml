@@ -1,0 +1,29 @@
+name: NodeJS with Grunt
+
+on:
+  push:
+    branches: [ dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+  
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js 14.17.0
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.17.0
+
+    - name: Build
+      run: |
+        npm i -g @angular/cli@12.2.13
+        cd ./frontend && npm install && ng build --configuration production
+        cd ../backend && npm install
+    - uses: akhileshns/heroku-deploy@v3.12.12
+      with:
+        appdir: "./backend"
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        heroku_app_name: "investigations-research" 
+        heroku_email: ${{secrets.EMAIL}}
