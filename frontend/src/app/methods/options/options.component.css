@@ -1,0 +1,17 @@
+.example-card {
+  max-width: 400px;
+}
+
+.header-avatar {
+  background-size: cover;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+}
+
+.img-sequence{
+  justify-content: center;
+}
+

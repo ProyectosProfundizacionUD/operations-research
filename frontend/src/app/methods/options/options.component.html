@@ -1,0 +1,79 @@
+<div class="content py-4">
+  <mat-card class="example-card">
+    <mat-card-header>
+      <mat-card-title>Opciones</mat-card-title>
+      <mat-card-subtitle>Seleccione la opcon</mat-card-subtitle>
+
+      <section class="example-section">
+        <mat-radio-group>
+          <mat-radio-button
+            class="example-margin"
+            (click)="this.isChargingFile = false"
+            [value]="false"
+            >Método Grafico</mat-radio-button
+          >
+          <br />
+          <mat-radio-button
+            class="example-margin"
+            (click)="this.isChargingFile = true"
+            [value]="true"
+            >Simplex</mat-radio-button
+          >
+        </mat-radio-group>
+      </section>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-form-field appearance="fill" class="w-100">
+        <mat-label>Organismo</mat-label>
+        <input matInput />
+      </mat-form-field>
+
+      <div class="mb-3" *ngIf="this.isChargingFile">
+        <div class="input-group">
+          <label for="upload-fasta"></label>
+          <input
+            type="file"
+            class="form-control"
+            id="upload-fasta"
+            aria-label="Upload"
+            (change)="makeAction()"
+            accept=".fasta"
+          />
+        </div>
+      </div>
+
+      <div *ngIf="this.isChargingFile == false">
+        <mat-form-field appearance="fill" class="w-100">
+          <mat-label>Secuencia con gi</mat-label>
+          <textarea
+            matInput
+            required
+          ></textarea>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="fill" class="w-100">
+        <mat-label>Descripción</mat-label>
+        <textarea
+          matInput
+          required
+        ></textarea>
+      </mat-form-field>
+
+      <div class="img-sequence">
+        <img
+          *ngIf="this.registerSequence.imgUrl != ''"
+          class="m-3 rounded mx-auto d-block"
+          width="150px"
+          [src]=""
+        />
+      </div>
+
+    </mat-card-content>
+    <mat-card-actions>
+      <button (click)="makeAction()" class="button" mat-raised-button>
+        Crear
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
