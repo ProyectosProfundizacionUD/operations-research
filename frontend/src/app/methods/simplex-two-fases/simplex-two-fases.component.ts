@@ -21,6 +21,8 @@ export class SimplexTwoFasesComponent implements OnInit {
 
   generateFields() {
     if (this.validations()) {
+      this.equations = []
+      this.variablesCountList = []
       let equationTemplate = '{';
       for (let j = 0; j < this.variablesCount; j++) {
         equationTemplate += `"X${j+1}": 0,`;
