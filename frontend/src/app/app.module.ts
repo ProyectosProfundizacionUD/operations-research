@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -18,6 +19,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTabsModule } from "@angular/material/tabs";
+import { MatSelectModule } from "@angular/material/select";
 
 @NgModule({
   declarations: [
@@ -28,6 +30,7 @@ import { MatTabsModule } from "@angular/material/tabs";
     OptionsComponent,
   ],
   imports: [
+    FormsModule,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
@@ -38,7 +41,8 @@ import { MatTabsModule } from "@angular/material/tabs";
     MatButtonModule,
     MatInputModule,
     MatIconModule,
-    MatTabsModule
+    MatTabsModule,
+    MatSelectModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
