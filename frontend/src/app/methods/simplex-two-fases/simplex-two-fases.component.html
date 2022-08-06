@@ -71,7 +71,17 @@
           </mat-form-field>
         </td>
         <td>
-          {{equation.op}}
+          <mat-form-field appearance="fill" class="w-100">
+            <mat-label>Operacion</mat-label>
+            <mat-select [(ngModel)]="equation.op">
+              <mat-option 
+                *ngFor="let opSelected of ['=','<=','>=']" 
+                [value]="opSelected"
+              >
+              {{opSelected}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
         </td>
         <td>
           <mat-form-field appearance="fill">

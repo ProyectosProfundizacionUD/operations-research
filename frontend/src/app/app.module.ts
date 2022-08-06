@@ -20,6 +20,10 @@ import { MatInputModule } from "@angular/material/input";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTabsModule } from "@angular/material/tabs";
 import { MatSelectModule } from "@angular/material/select";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
+
+//services
+import { UtilsService } from "./services/utils.service";
 
 @NgModule({
   declarations: [
@@ -43,8 +47,9 @@ import { MatSelectModule } from "@angular/material/select";
     MatIconModule,
     MatTabsModule,
     MatSelectModule,
+    MatSnackBarModule,
   ],
-  providers: [],
+  providers: [ UtilsService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

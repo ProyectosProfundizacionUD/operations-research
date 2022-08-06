@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { UtilsService } from 'src/app/services/utils.service';
 
 @Component({
   selector: 'app-simplex-two-fases',
@@ -15,7 +16,9 @@ export class SimplexTwoFasesComponent implements OnInit {
   equations: any = [];
   variablesCountList: any = [];
 
-  constructor() {}
+  constructor(
+    private _utils: UtilsService
+  ) {}
 
   ngOnInit(): void {}
 
@@ -64,6 +67,16 @@ export class SimplexTwoFasesComponent implements OnInit {
   }
 
   validations() {
+    if(
+        this.simplexType == "default" ||
+        this.variablesCount == 0 ||
+        this.variablesCount == undefined ||
+        this.restrictionsCount == 0 ||
+        this.restrictionsCount == undefined
+      ){
+        this._utils.openSnackBarError("Debe ingresar correctamente todos los campos")
+        return false;
+    }
     return true;
   }
 }
