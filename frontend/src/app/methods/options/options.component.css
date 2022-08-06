@@ -1,17 +1,17 @@
-.example-card {
-  max-width: 400px;
-}
-
-.header-avatar {
-  background-size: cover;
-}
-
 .content {
   display: flex;
   justify-content: center;
 }
 
-.img-sequence{
+.tab-width {
+  max-width: 80%;
+  width: 60%
+}
+
+.tab-center {
+  display: flex;
+  text-align: center;
   justify-content: center;
+  text-align: center;
 }
 

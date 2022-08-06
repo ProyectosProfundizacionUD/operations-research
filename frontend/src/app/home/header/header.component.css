@@ -8,5 +8,8 @@ a {
 }
 
 .bgHeader {
-  background-color: #383d38;
+  background-color: #3f51b5;
+  display: flex;
+  text-align: center;
+  justify-content: center;
 }

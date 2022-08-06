@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -16,6 +17,13 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatRadioModule } from "@angular/material/radio";
 import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
+import { MatIconModule } from "@angular/material/icon";
+import { MatTabsModule } from "@angular/material/tabs";
+import { MatSelectModule } from "@angular/material/select";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
+
+//services
+import { UtilsService } from "./services/utils.service";
 
 @NgModule({
   declarations: [
@@ -26,6 +34,7 @@ import { MatInputModule } from "@angular/material/input";
     OptionsComponent,
   ],
   imports: [
+    FormsModule,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
@@ -34,9 +43,13 @@ import { MatInputModule } from "@angular/material/input";
     MatFormFieldModule,
     MatRadioModule,
     MatButtonModule,
-    MatInputModule
+    MatInputModule,
+    MatIconModule,
+    MatTabsModule,
+    MatSelectModule,
+    MatSnackBarModule,
   ],
-  providers: [],
+  providers: [ UtilsService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
