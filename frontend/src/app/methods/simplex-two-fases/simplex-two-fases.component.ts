@@ -39,13 +39,9 @@ export class SimplexTwoFasesComponent implements OnInit {
       operationEquationTemplate += `"type":"${this.simplexType.substring(0, 3)} Z: "}`;
       equationTemplate += '"op": "=",';
       equationTemplate += '"result": 0';
-      equationTemplate += '}';
-
-      console.log(JSON.parse(equationTemplate));          // !to delete
-      console.log(JSON.parse(operationEquationTemplate).type); // !to delete
+      equationTemplate += '}';      
       
-      
-      this.operationEquation = operationEquationTemplate;
+      this.operationEquation = JSON.parse(operationEquationTemplate);
       for (let i = 0; i < this.restrictionsCount; i++) {
         this.equations.push(JSON.parse(equationTemplate));
       }
@@ -55,7 +51,8 @@ export class SimplexTwoFasesComponent implements OnInit {
   }
 
   startSimplex() {
-    console.log(this.equations);
+    console.log(this.equations); // !to delete
+    console.log(this.operationEquation); // !to delete
     
     switch (this.simplexType) {
       case 'Minimización':
@@ -91,7 +88,7 @@ export class SimplexTwoFasesComponent implements OnInit {
           countCXCJwFields += 1;
           countXbFields += 1;
           break;
-      }
+      } 
     }
     console.log(countCXCJwFields);
     console.log(countXbFields);
