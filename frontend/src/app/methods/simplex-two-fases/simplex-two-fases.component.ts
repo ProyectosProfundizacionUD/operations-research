@@ -8,13 +8,16 @@ import { UtilsService } from 'src/app/services/utils.service';
 })
 export class SimplexTwoFasesComponent implements OnInit {
   //first form variables
-  simplexType: string = 'default';
+  simplexType: string = 'Minimización';//'default';
   variablesCount: number = 0;
   restrictionsCount: number = 0;
   //generated form variables
   showGeneratedFields: boolean = false;
+  operationEquation: any = {};
   equations: any = [];
   variablesCountList: any = [];
+  //simplex process
+  initialMatrix: any = [];
 
   constructor(
     private _utils: UtilsService
@@ -26,18 +29,23 @@ export class SimplexTwoFasesComponent implements OnInit {
     if (this.validations()) {
       this.equations = []
       this.variablesCountList = []
+      let operationEquationTemplate = "";
       let equationTemplate = '{';
       for (let j = 0; j < this.variablesCount; j++) {
         equationTemplate += `"X${j+1}": 0,`;
         this.variablesCountList.push(`X${j+1}`)
       }
+      operationEquationTemplate = equationTemplate;
+      operationEquationTemplate += `"type":"${this.simplexType.substring(0, 3)} Z: "}`;
       equationTemplate += '"op": "=",';
       equationTemplate += '"result": 0';
       equationTemplate += '}';
 
-      console.log(JSON.parse(equationTemplate));
+      console.log(JSON.parse(equationTemplate));          // !to delete
+      console.log(JSON.parse(operationEquationTemplate).type); // !to delete
       
-
+      
+      this.operationEquation = operationEquationTemplate;
       for (let i = 0; i < this.restrictionsCount; i++) {
         this.equations.push(JSON.parse(equationTemplate));
       }
@@ -51,19 +59,43 @@ export class SimplexTwoFasesComponent implements OnInit {
     
     switch (this.simplexType) {
       case 'Minimización':
-        this.Minimizacion();
+        this.simplexProcess(this.Minix, 1);
         break;
       case 'Maximización':
-        this.Maximizacion();
+        this.simplexProcess(this.Max, -1);
         break;
     }
   }
 
-  Maximizacion() {
+  Minix() {
+    console.log('mini');
+  }
+  Max() {
     console.log('maxi');
   }
-  Minimizacion() {
-    console.log('mini');
+
+  simplexProcess(validationsType: any, rValue: number){
+    let countCXCJwFields = 0;
+    let countXbFields = 0;
+    for (let i = 0; i < this.restrictionsCount; i++) {
+      switch (this.equations[i].op) {
+        case "≥":
+          countCXCJwFields += 2;
+          countXbFields += 1;
+          break;
+        case "≤":
+          countCXCJwFields += 1;
+          countXbFields += 1;
+          break;
+        case "=":
+          countCXCJwFields += 1;
+          countXbFields += 1;
+          break;
+      }
+    }
+    console.log(countCXCJwFields);
+    console.log(countXbFields);
+    
   }
 
   validations() {
