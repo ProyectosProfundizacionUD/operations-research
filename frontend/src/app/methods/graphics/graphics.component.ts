@@ -44,7 +44,9 @@ export class GraphicsComponent implements OnInit {
   }
 
   startSimplex() {
-    console.log(this.equations);
+    console.log(this.equations[0].X1);
+    console.log(this.equations[0].X2);
+    console.log(this.equations[0].result);
 
     switch (this.simplexType) {
       case 'Minimización':
