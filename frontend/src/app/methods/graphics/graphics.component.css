@@ -1,0 +1,37 @@
+.content {
+    margin-top: 2%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .card {
+    max-width: 400px;
+  }
+  
+  .content-equations {
+    margin-top: 2%;
+  }
+  
+  div::-webkit-scrollbar {
+    -webkit-appearance: none;
+  }
+  
+  div::-webkit-scrollbar:vertical {
+    width: 8px;
+  }
+  
+  div::-webkit-scrollbar-button:increment,
+  .sidebar::-webkit-scrollbar-button {
+    display: none;
+  }
+  
+  div::-webkit-scrollbar:horizontal {
+    height: 10px;
+  }
+  
+  div::-webkit-scrollbar-thumb {
+    background-color: #383d38;
+    border-radius: 20px;
+    border: 0;
+  }
