@@ -226,7 +226,7 @@ export class SimplexTwoFasesComponent implements OnInit {
         endRows +=  countTotalRows + 1;
       } 
       console.log(result[0]);
-      result[0] = true; 
+      //result[0] = true; 
           
     } while (result[0] == false);    
     console.log("termino");
@@ -250,7 +250,9 @@ export class SimplexTwoFasesComponent implements OnInit {
     let tempNumber;
     for (let i = startRows; i < endRows; i++) {
       if(historyMatrixTemp[i][selectedIndex] != 0){
-        tempNumber = historyMatrixTemp[i][historyMatrixTemp.length - 1] / historyMatrixTemp[i][selectedIndex];
+        
+        tempNumber = historyMatrixTemp[i][totalCountOfCol - 1] / historyMatrixTemp[i][selectedIndex];
+        console.log(`${historyMatrixTemp[i][totalCountOfCol - 1]} / ${historyMatrixTemp[i][selectedIndex]} = ${tempNumber}`);
         tempCandidates.push(tempNumber);
       }      
     }
@@ -289,6 +291,7 @@ export class SimplexTwoFasesComponent implements OnInit {
     }
 
     console.log(historyMatrixTemp); //! to delete
+    return historyMatrixTemp;
   }
 
   calculateCol(
@@ -302,6 +305,8 @@ export class SimplexTwoFasesComponent implements OnInit {
     let tempItem = 0;
     for (let i = 1; i < totalCountOfCol; i++) {
       for (let j = rowToStart; j < totalCountOfRows; j++) {
+        //console.log(`Estoy fallando por: ${this.historyMatrix[j][0]} * ${this.historyMatrix[j][i]}`); // ! to do
+        
         tempItem += (this.historyMatrix[j][0] * this.historyMatrix[j][i])
         
         if(j == (totalCountOfRows - 1))
@@ -314,11 +319,18 @@ export class SimplexTwoFasesComponent implements OnInit {
     }
     
     this.historyMatrix[totalCountOfRows] = this.tempArray;
+    console.log(`arrayTemporal`);
+    console.log(this.tempArray);
+    
     
     //eliminamos Z para validar entre el resto de numeros cual es el menor
     let newArray = [0]
     newArray = newArray.concat(this.tempArray);
     newArray.pop()    
+
+    console.log("arrayTemporalModificado");    
+    console.log(newArray);
+    
 
     let selectedValue = 0;
     let selectedIndex;
