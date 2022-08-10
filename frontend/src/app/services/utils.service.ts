@@ -19,6 +19,15 @@ export class UtilsService {
       panelClass: ['style-snackBarTrue'],
     });
   }
+  openSnackBarSuccesfullWithDuration(text:string, duration: number) {
+    this.message = text;
+    this._snackBar.open(this.message, 'X', {
+      horizontalPosition: this.horizontalPosition,
+      verticalPosition: this.verticalPosition,
+      duration: duration * 1000,
+      panelClass: ['style-snackBarTrue'],
+    });
+  }
 
   openSnackBarError(text:string) {
     this.message = text;

@@ -333,7 +333,8 @@ export class SimplexTwoFasesComponent implements OnInit {
       // * end modify
     } while (result[0] == false);
     this.rowSize = countTotalRows;
-    console.log("endProcess");    
+    console.log("endProcess");
+    this._utils.openSnackBarSuccesfullWithDuration("Se completado el algoritmo, haga scroll hacia abajo para ver los resultados", 8);
   }
 
   calculateRows(
