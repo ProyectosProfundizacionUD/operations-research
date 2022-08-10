@@ -9,6 +9,7 @@ import { GraphicsComponent } from './methods/graphics/graphics.component';
 import { SimplexTwoFasesComponent } from './methods/simplex-two-fases/simplex-two-fases.component';
 import { OptionsComponent } from './methods/options/options.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
 
 //material
 import { MatToolbarModule } from "@angular/material/toolbar";
@@ -36,6 +37,7 @@ import { UtilsService } from "./services/utils.service";
   imports: [
     FormsModule,
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatToolbarModule,

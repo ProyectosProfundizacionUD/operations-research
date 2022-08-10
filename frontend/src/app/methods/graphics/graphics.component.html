@@ -1,111 +1,161 @@
 <div class="container content">
-    <!-- Primer Formulario -->
-    <mat-card class="card">
-      <span class="me-3 fs-5">Escoge el tipo de operación</span>
-      <mat-form-field appearance="fill" class="w-100">
-        <mat-label>Maximización/Minimización</mat-label>
-        <mat-select [(ngModel)]="this.simplexType">
-          <mat-option 
-            *ngFor="let typeSelected of ['Minimización','Maximización']" 
-            [value]="typeSelected"
-          >
-            {{typeSelected}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      
-      <br>
-  
-      <span class="me-3 fs-5">Digite el número de variables</span>
-      <mat-form-field appearance="fill" class="w-100">
-        <mat-label>Variables</mat-label>
-        <input 
-          type="number" 
-          min="0" 
-          max="100" 
-          value="0"
-          [(ngModel)]="this.variablesCount"
-          matInput
-          >
-      </mat-form-field>
-      <br>
-    
-      <span class="me-3 fs-5">Digite la cantidad de restricciones</span>
-      <mat-form-field appearance="fill" class="w-100">
-        <mat-label>Restricciones</mat-label>
-        <input 
-          type="number" 
-          min="0" 
-          max="100" 
-          value="0"
-          [(ngModel)]="this.restrictionsCount"
-          matInput
+  <!-- Primer Formulario -->
+  <mat-card class="card">
+    <span class="me-3 fs-5">Escoge el tipo de operación</span>
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Maximización/Minimización</mat-label>
+      <mat-select [(ngModel)]="this.simplexType">
+        <mat-option
+          *ngFor="let typeSelected of ['Minimización', 'Maximización']"
+          [value]="typeSelected"
         >
-      </mat-form-field>
-      <br>
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="generateFields()"
-      >
-        Generar Campos!
-      </button>
-    </mat-card>  
+          {{ typeSelected }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <br />
+
+    <span class="me-3 fs-5">Digite el número de variables</span>
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Variables</mat-label>
+      <input
+        type="number"
+        min="0"
+        max="100"
+        value="0"
+        [(ngModel)]="this.variablesCount"
+        matInput
+        disabled="true"
+      />
+    </mat-form-field>
+    <br />
+
+    <span class="me-3 fs-5">Digite la cantidad de restricciones</span>
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Restricciones</mat-label>
+      <input
+        type="number"
+        min="0"
+        max="100"
+        value="0"
+        [(ngModel)]="this.restrictionsCount"
+        matInput
+      />
+    </mat-form-field>
+    <br />
+    <button mat-raised-button (click)="generateFields()">
+      Generar Campos!
+    </button>
+  </mat-card>
+</div>
+<!--Campos Generados-->
+<div *ngIf="showGeneratedFields">
+  <!-- Campos generados ecuacion a minimizar -->
+  <div class="content overflow-auto">
+    <div class="overflow-auto">
+      <table>
+        <tr>
+          <td>
+            <p class="fs-6 me-2">{{ this.operationEquation.type }}</p>
+          </td>
+          <td *ngFor="let xs of variablesCountList; let j = index">
+            <mat-form-field appearance="fill">
+              <mat-label>{{ xs }}</mat-label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value="0"
+                [(ngModel)]="operationEquation[xs]"
+                matInput
+              />
+            </mat-form-field>
+          </td>
+        </tr>
+      </table>
+    </div>
   </div>
-  <!-- Campos generados -->
+  <!-- Campos generados restricciones -->
+  <div class="fs-3 content">
+    <span>Sujeto a:</span>
+  </div>
   <div class="content overflow-auto" *ngIf="showGeneratedFields">
-    <div class="overflow-auto" >
+    <div class="overflow-auto">
       <table>
         <tr *ngFor="let equation of equations; let i = index">
           <td *ngFor="let xs of variablesCountList; let j = index">
             <mat-form-field appearance="fill">
-              <mat-label>{{xs}}</mat-label>
-              <input 
-                type="number" 
-                min="0" 
-                max="100"
+              <mat-label>{{ xs }}</mat-label>
+              <input
+                type="number"
                 value="0"
-                [(ngModel)]="this.equation[xs]"
+                [(ngModel)]="equation[xs]"
                 matInput
-                >
+              />
             </mat-form-field>
           </td>
           <td>
             <mat-form-field appearance="fill" class="w-100">
               <mat-label>Operacion</mat-label>
               <mat-select [(ngModel)]="equation.op">
-                <mat-option 
-                  *ngFor="let opSelected of ['=','<=','>=']" 
+                <mat-option
+                  *ngFor="let opSelected of ['=', '≤', '≥']"
                   [value]="opSelected"
                 >
-                {{opSelected}}
+                  {{ opSelected }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
           </td>
           <td>
             <mat-form-field appearance="fill">
-              <mat-label>result {{i + 1}}</mat-label>
-              <input 
-                type="number" 
-                min="0" 
-                max="100"
+              <mat-label>result {{ i + 1 }}</mat-label>
+              <input
+                type="number"
                 value="0"
                 [(ngModel)]="equation.result"
                 matInput
-                >
+              />
             </mat-form-field>
           </td>
         </tr>
       </table>
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="this.startSimplex()"
-      >
-        Comenzar!
-      </button>
+      <button mat-raised-button (click)="this.start()">¡Comenzar!</button>
     </div>
   </div>
-
-  
+</div>
+<!-- Results Table -->
+<div *ngIf="showResultsTable">
+  <div class="content overflow-auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col"># Punto</th>
+          <th scope="col">Coordenada X (X1)</th>
+          <th scope="col">Coordenada Y (X2)</th>
+          <th scope="col">Valor de la función objetivo (Z)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr 
+          *ngFor="let item of resultsMatrix.tempPoints; let i = index"
+          [ngClass]="{
+            'table-danger': resultsMatrix.resultsRestrictions[i] == false,
+            'table-success': resultsMatrix.indexSelected == i
+          }"
+        >
+          <td>
+            {{i + 1}}
+          </td>
+          <td *ngFor="let punto of item">
+            {{punto}}
+          </td>
+          <td>
+            {{resultsMatrix.results[i]}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
