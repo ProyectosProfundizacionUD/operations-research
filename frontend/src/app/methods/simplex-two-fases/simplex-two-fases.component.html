@@ -174,3 +174,49 @@
     </table>
   </div>  
 </div>
+<!-- Vista fase 2 -->
+<div  *ngIf="showTwoFase">
+  <p class="fs-3 my-2 mt-4 text-center">Fase 2</p>
+  <div class="content overflow-auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col" class="border-0">CxCj</th>
+          <th *ngFor="let item of twoFaseCxCj">
+            {{ item }}
+          </th>
+          <th class="border-0">Xb/Bi</th>
+        </tr>
+        <tr>
+          <th scope="col"></th>
+          <th *ngFor="let item of XSs">
+            {{ item }}
+          </th>
+          <th *ngFor="let item of SSs">
+            {{ item }}
+          </th>
+          <th *ngFor="let item of HSs">
+            {{ item }}
+          </th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let rowMatrix of twoFaseMatrix; let j = index"
+          [ngClass]="{ 'table-secondary': positionToPrint.includes(j) }"
+        >
+          <td *ngFor="let fieldMatrix of rowMatrix; let i = index">
+            {{
+              i == 0 && positionToPrint.includes(j)
+                ? "ZjCj"
+                : positionToPrint.includes(j) && i == rowMatrix.length - 1
+                ? "Z = " + fieldMatrix
+                : fieldMatrix
+            }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>  
+</div>

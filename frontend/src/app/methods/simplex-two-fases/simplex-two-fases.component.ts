@@ -335,6 +335,7 @@ export class SimplexTwoFasesComponent implements OnInit {
     this.rowSize = countTotalRows;
     console.log("endProcess");
     this._utils.openSnackBarSuccesfullWithDuration("Se completado el algoritmo, haga scroll hacia abajo para ver los resultados", 8);
+    this.showTwoFase = true;
   }
 
   calculateRows(
