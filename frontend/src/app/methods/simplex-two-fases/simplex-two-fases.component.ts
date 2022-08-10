@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { concat } from 'rxjs';
 import { UtilsService } from 'src/app/services/utils.service';
 
 @Component({
@@ -20,10 +19,26 @@ export class SimplexTwoFasesComponent implements OnInit {
   //simplex process
   initialCxCj = [];
   initialMatrix: any = [];
-  twoFaseCxCj = [];
+  twoFaseCxCj: any = [];
   twoFaseMatrix: any = [];
   firstMatrix: any = [];
+  firstRowPivotPositionList: any = [];
   historyMatrix: any = [];
+  //fasesPositions
+  faseOnePositionsR: any = [];
+  faseOnePositionsX: any = [];
+  fasetwoColPivotPositionList: any = [];
+  //showMoreViews
+  showFirstFase: boolean = false;
+  showTwoFase: boolean = false;
+  //visual titles
+  XSs: any = [];
+  RSs: any = [];
+  SSs: any = [];
+  HSs: any = [];
+  rowSize: number = 0;
+  positionToPrint: any = [];
+
 
   tempArray: any = [];
 
@@ -77,6 +92,10 @@ export class SimplexTwoFasesComponent implements OnInit {
 
   simplexProcess(method: string, rValue: number) {
     this.initialMatrix = this.equations;
+    this.faseOnePositionsR = [];
+    this.faseOnePositionsX = [];
+    this.firstRowPivotPositionList = [];
+    this.rowSize = 0;
 
     let countNewVariables = 0;
     let countTotalRows = 0;
@@ -154,6 +173,8 @@ export class SimplexTwoFasesComponent implements OnInit {
     console.log('Matriz inicial'); // !to delete
     console.log(this.initialMatrix); // !to delete
 
+    this.visualListSetting(R, H, S);
+
     this.DoProcess(
       CXCJ,
       this.initialMatrix,
@@ -165,6 +186,23 @@ export class SimplexTwoFasesComponent implements OnInit {
       S,
       method
     );
+  }
+
+  visualListSetting(R: number, H: number, S: number){
+    this.XSs = []
+    this.RSs = []
+    this.HSs = []
+    this.SSs = []
+    this.positionToPrint = []
+    
+    for (let i = 0; i < this.variablesCount; i++)
+      this.XSs.push(`X${i + 1}`)
+    for (let i = 0; i < R - 1; i++)
+      this.RSs.push(`R${i + 1}`);
+    for (let i = 0; i < H - 1; i++)
+      this.HSs.push(`H${i + 1}`);    
+    for (let i = 0; i < S - 1; i++)
+      this.SSs.push(`S${i + 1}`);
   }
 
   DoProcess(
@@ -181,6 +219,8 @@ export class SimplexTwoFasesComponent implements OnInit {
     //Set a correct format to historyMatrix and initialCxCj
     this.CleanMatrix(countTotalRows, CxCj, ZjCj, R, H,S);
     this.firstMatrix = this.historyMatrix;
+    for (let index = 0; index < countTotalRows; index++)
+      this.faseOnePositionsX.push();
 
     console.log("initialCxCj");     // !to delete
     console.log(this.initialCxCj);  // !to delete
@@ -195,8 +235,12 @@ export class SimplexTwoFasesComponent implements OnInit {
         startRows,
         totalCountOfCol,
         endRows,
-        method
+        method,
+        this.historyMatrix,
+        this.initialCxCj
       );
+
+      this.historyMatrix = result[3];
       
       if(result[0] == false){
         console.log('History matrix'); // !to delete
@@ -212,25 +256,86 @@ export class SimplexTwoFasesComponent implements OnInit {
           startRows,
           endRows,
           this.historyMatrix,
-          result[2]
+          result[2],
+          this.initialCxCj
         );
 
-        // *de no ser asi, calcular la fila pivote
-        // *calcular las filas para la siguiente iteracion
-        // *terminar do while y repetir iteración
-
-        // **una vez terminada la primera fase comenzamos la segunda
-        
-        // *subimos las variables de las filas para la siguiente iteración
         startRows += countTotalRows + 1;
         endRows +=  countTotalRows + 1;
       } 
       console.log(result[0]);
-      //result[0] = true; 
           
     } while (result[0] == false);    
-    console.log("termino");
-    
+    console.log("fase 1 complete"); // !to delete
+    console.log("Posiciones de R a suprimir"); // !to delete
+    console.log(this.faseOnePositionsR); // !to delete
+    console.log("Posiciones de col a incluir bi"); // !to delete
+    console.log(this.faseOnePositionsX); // !to delete
+
+    console.log("start two fases");    
+    this.showFirstFase = true;
+    this.startTwoFases(totalCountOfCol, countTotalRows, startRows, endRows, H, S, method);
+  }
+
+  startTwoFases(
+    totalCountOfCol: number,
+    countTotalRows: number,
+    startRows: number,
+    endRows: number,
+    H: number,
+    S: number,
+    method: string
+  ){
+    this.twoFaseCxCj = [];
+    this.twoFaseMatrix = [];
+    this.CleanFaseTwo(totalCountOfCol, countTotalRows, startRows, endRows, H, S);
+
+    let result;
+    startRows = 0;
+    endRows = countTotalRows;
+    totalCountOfCol = totalCountOfCol - this.faseOnePositionsR.length;
+
+    do {
+      // * to modify
+      result = this.calculateCol(
+        startRows,
+        totalCountOfCol,
+        endRows,
+        method,
+        this.twoFaseMatrix,
+        this.twoFaseCxCj
+      );
+
+      this.twoFaseMatrix = result[3];
+      
+      if(result[0] == false){
+        console.log('History matrix'); // !to delete
+        console.log(this.twoFaseMatrix); // !to delete
+
+        for (let i = 0; i < countTotalRows + 1; i++) {
+          this.twoFaseMatrix.push([]);          
+        }
+        
+        this.twoFaseMatrix = this.calculateRows(
+          totalCountOfCol,
+          countTotalRows,
+          startRows,
+          endRows,
+          this.twoFaseMatrix,
+          result[2],
+          this.twoFaseCxCj
+        );
+
+        startRows += countTotalRows + 1;
+        endRows +=  countTotalRows + 1;
+      } 
+      console.log(result[0]);
+      // * end modify
+    } while (result[0] == false);
+    this.rowSize = countTotalRows;
+    console.log("endProcess");
+    this._utils.openSnackBarSuccesfullWithDuration("Se completado el algoritmo, haga scroll hacia abajo para ver los resultados", 8);
+    this.showTwoFase = true;
   }
 
   calculateRows(
@@ -239,11 +344,12 @@ export class SimplexTwoFasesComponent implements OnInit {
     startRows: number,
     endRows: number,
     historyMatrixTemp: any[],
-    selectedIndex: number
+    selectedIndex: number,
+    faseCxCj: any[],
   ){
-    console.log(`startrow: ${startRows}`);
-    console.log(`endrow: ${endRows}`);
-    console.log(`totalCountOfRows: ${totalCountOfRows}`);
+    console.log(`startrow: ${startRows}`); // !to delete
+    console.log(`endrow: ${endRows}`); // !to delete
+    console.log(`totalCountOfRows: ${totalCountOfRows}`); // !to delete
     
     console.log("startCalculateRow");
     let tempCandidates = []
@@ -259,17 +365,21 @@ export class SimplexTwoFasesComponent implements OnInit {
     console.log("DivResultCandidates"); // !to delete
     console.log(tempCandidates); // !to delete
     
-    let indexRow = this.closestToZero(tempCandidates) + startRows;
+    let closestToZeroIndex = this.closestToZero(tempCandidates); // *en esta posicion enviaremos los valores de los x1
+    // * estas lineas no afectan la segunda fase *
+    this.faseOnePositionsX.push(selectedIndex);// *guardamos la posicion de la columna
+    this.firstRowPivotPositionList.push(closestToZeroIndex);
+
+    let indexRow = closestToZeroIndex + startRows;
     console.log("indexRow " + indexRow);  // !to delete
 
-    let pivotRowNumber = historyMatrixTemp[indexRow][selectedIndex];
-    console.log(`PivotRow: ${pivotRowNumber}`); // !to delete
+    let pivotRowNumber = historyMatrixTemp[indexRow][selectedIndex]; 
     
     //multiplicamos el inverso multiplicativo con la fila pivote
     let InverseMultiplicative = 1/pivotRowNumber;
-    historyMatrixTemp[indexRow + totalCountOfRows + 1].push(this.initialCxCj[selectedIndex - 1])
+    historyMatrixTemp[indexRow + totalCountOfRows + 1].push(faseCxCj[selectedIndex - 1])
     for (let i = 1; i < totalCountOfCol; i++) { //!! falta pushear el valor de x!
-      historyMatrixTemp[indexRow + totalCountOfRows + 1].push(parseFloat((historyMatrixTemp[indexRow][i] * InverseMultiplicative).toFixed(2)));
+      historyMatrixTemp[indexRow + totalCountOfRows + 1].push(this.roundDecimals(historyMatrixTemp[indexRow][i] * InverseMultiplicative));
     }
 
     //sacamos el resto de filas
@@ -282,7 +392,7 @@ export class SimplexTwoFasesComponent implements OnInit {
           if(j == 1)
             historyMatrixTemp[i].push(historyMatrixTemp[i - totalCountOfRows - 1][0])  
           
-          tempNumber = (historyMatrixTemp[indexRow + totalCountOfRows + 1][j] * inverseAdit) + historyMatrixTemp[i - totalCountOfRows - 1][j];
+          tempNumber = this.roundDecimals((historyMatrixTemp[indexRow + totalCountOfRows + 1][j] * inverseAdit) + historyMatrixTemp[i - totalCountOfRows - 1][j]);
           //console.log(`${historyMatrixTemp[indexRow + totalCountOfRows + 1][j]}*${inverseAdit}+${historyMatrixTemp[i - totalCountOfRows - 1][j]}=${tempNumber}`); //! to delete
         }
         if(i != (indexRow + totalCountOfRows + 1))
@@ -298,27 +408,30 @@ export class SimplexTwoFasesComponent implements OnInit {
     rowToStart: number,
     totalCountOfCol: number,
     totalCountOfRows: number,
-    method: string
+    method: string,
+    historyMatrixTemp: any[],
+    FaseCxCj: any[]
   ) {
     console.log("calculateColStarted");
     this.tempArray = [0];
     let tempItem = 0;
     for (let i = 1; i < totalCountOfCol; i++) {
       for (let j = rowToStart; j < totalCountOfRows; j++) {
-        //console.log(`Estoy fallando por: ${this.historyMatrix[j][0]} * ${this.historyMatrix[j][i]}`); // ! to do
+        //console.log(`Estoy fallando por: ${historyMatrixTemp[j][0]} * ${historyMatrixTemp[j][i]}`); // ! to do
         
-        tempItem += (this.historyMatrix[j][0] * this.historyMatrix[j][i])
+        tempItem += (historyMatrixTemp[j][0] * historyMatrixTemp[j][i])
         
         if(j == (totalCountOfRows - 1))
           if(i <= totalCountOfCol - 2)
-            tempItem -= this.initialCxCj[i - 1];
+            tempItem -= FaseCxCj[i - 1];
         
       }
-      this.tempArray.push(tempItem);
+      this.tempArray.push(this.roundDecimals(tempItem));
       tempItem = 0;
     }
     
-    this.historyMatrix[totalCountOfRows] = this.tempArray;
+    historyMatrixTemp[totalCountOfRows] = this.tempArray;
+    this.positionToPrint.push(totalCountOfRows);  //* usado para pintar el front
     console.log(`arrayTemporal`);
     console.log(this.tempArray);
     
@@ -347,7 +460,63 @@ export class SimplexTwoFasesComponent implements OnInit {
     selectedIndex = this.tempArray.findIndex( (value: number) => value == selectedValue)
     console.log(`index: ${selectedIndex}, value: ${selectedValue}, end: ${endFase}`);
     
-    return [endFase, selectedValue, selectedIndex]
+    return [endFase, selectedValue, selectedIndex, historyMatrixTemp]
+  }
+
+  CleanFaseTwo(
+    totalCountOfCol: number,
+    countTotalRows: number,
+    startRows: number,
+    endRows: number,
+    H: number,
+    S: number,
+  ){
+    console.log(`startRow ${startRows}, endRow${endRows}`); // !to delete 8 y 11
+    let tempArray = [];
+    //se forma el nuevo CxCj
+    for (let i = 0; i < this.variablesCount; i++) {
+      tempArray.push(this.operationEquation[`X${i+1}`]);
+    }
+    for (let i = tempArray.length - 1; i < this.initialCxCj.length; i++) {
+      if(!this.faseOnePositionsR.includes(i)){
+        tempArray.push(this.initialCxCj[i])
+      }
+    }
+    tempArray.forEach(element => {
+      this.twoFaseCxCj.push(element);
+    });    
+
+    console.log("RowPivotes"); // !to delete
+    console.log(this.firstRowPivotPositionList); // !to delete
+    console.log("twoFaseCxCj"); // !to delete
+    console.log(this.twoFaseCxCj); // !to delete
+
+    for (let i = 0; i < countTotalRows + 1; i++)
+      this.twoFaseMatrix.push([]);
+
+    let countRows = 0;
+    tempArray = [];
+
+    // ! firstRowPivotPositionList //[0, 1]
+    // ! faseOnePositionsX // [1, 2]
+    for (let i = 0; i < this.firstRowPivotPositionList.length; i++) {
+      this.twoFaseMatrix[this.firstRowPivotPositionList[i]].push(this.twoFaseCxCj[this.faseOnePositionsX[i] - 1]);
+    }
+
+    for (let i = startRows; i < endRows; i++) {      
+      for (let j = 1; j < totalCountOfCol; j++) {
+        if(!this.faseOnePositionsR.includes(j - 1)){
+          if((j - 1) == 0 && this.twoFaseMatrix[countRows].length == 0)
+            this.twoFaseMatrix[countRows].push(this.historyMatrix[i][j - 1]);
+          this.twoFaseMatrix[countRows].push(this.historyMatrix[i][j]);
+        }
+      }
+      tempArray = [];
+      countRows += 1;
+    }
+    console.log("twoFaseMatrix");
+    console.log(this.twoFaseMatrix);    
+    
   }
 
   CleanMatrix(
@@ -384,8 +553,10 @@ export class SimplexTwoFasesComponent implements OnInit {
     for (let i = 0; i < countTotalRows; i++) {
       for (let j = 0; j < R - 1; j++) {
         this.historyMatrix[i].push(this.initialMatrix[i][`R${j+1}`]);
-        if(i == 0)
-          this.tempArray.push(CxCj[`R${j+1}`]);   
+        if(i == 0){
+          this.tempArray.push(CxCj[`R${j+1}`]);
+          this.faseOnePositionsR.push(this.tempArray.length - 1);
+        }          
       }
     }
     //add H's
@@ -430,6 +601,10 @@ export class SimplexTwoFasesComponent implements OnInit {
     console.log("closet to zero: " + closest); // !to delete
     
     return index;
+  }
+  roundDecimals(numb: number){
+    var rounded = Math.round((numb + Number.EPSILON) * 100) / 100;
+    return rounded;
   }
   validations() {
     if (

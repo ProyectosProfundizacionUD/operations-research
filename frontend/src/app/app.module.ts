@@ -9,7 +9,10 @@ import { GraphicsComponent } from './methods/graphics/graphics.component';
 import { SimplexTwoFasesComponent } from './methods/simplex-two-fases/simplex-two-fases.component';
 import { OptionsComponent } from './methods/options/options.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
+import { HttpClientModule } from '@angular/common/http';
+import { PlotlyModule  } from 'angular-plotly.js';
+import * as PlotlyJS from 'plotly.js-dist-min';
+PlotlyModule.plotlyjs = PlotlyJS;
 //material
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatCardModule } from "@angular/material/card";
@@ -36,6 +39,7 @@ import { UtilsService } from "./services/utils.service";
   imports: [
     FormsModule,
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatToolbarModule,
@@ -48,6 +52,7 @@ import { UtilsService } from "./services/utils.service";
     MatTabsModule,
     MatSelectModule,
     MatSnackBarModule,
+    PlotlyModule,
   ],
   providers: [ UtilsService ],
   bootstrap: [AppComponent]
