@@ -8,7 +8,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 })
 export class SimplexTwoFasesComponent implements OnInit {
   //first form variables
-  simplexType: string = 'default'; //'default';
+  simplexType: string = 'Minimización'; //'default';
   variablesCount: number = 0;
   restrictionsCount: number = 0;
   //generated form variables
@@ -48,30 +48,42 @@ export class SimplexTwoFasesComponent implements OnInit {
 
   generateFields() {
     if (this.validations()) {
-      this.equations = [];
-      this.variablesCountList = [];
-      let operationEquationTemplate = '';
-      let equationTemplate = '{';
-      for (let j = 0; j < this.variablesCount; j++) {
-        equationTemplate += `"X${j + 1}": 0,`;
-        this.variablesCountList.push(`X${j + 1}`);
-      }
-      operationEquationTemplate = equationTemplate;
-      operationEquationTemplate += `"type":"${this.simplexType.substring(
-        0,
-        3
-      )} Z: "}`;
-      equationTemplate += '"op": "=",';
-      equationTemplate += '"result": 0';
-      equationTemplate += '}';
-
-      this.operationEquation = JSON.parse(operationEquationTemplate);
-      for (let i = 0; i < this.restrictionsCount; i++) {
-        this.equations.push(JSON.parse(equationTemplate));
-      }
-
-      this.showGeneratedFields = true;
+      this.chargeOnChange();
     }
+  }
+
+  chargeOnChange(){
+    this.equations = [];
+    this.variablesCountList = [];
+    this.calculateRowEquations();
+  }
+  calculateRowEquations(){
+    console.log("calculate");
+    let tempVariableCountList = [];
+    let operationEquationTemplate = '';
+    let equationTemplate = '{';
+    for (let j = 0; j < this.variablesCount; j++) {
+      equationTemplate += `"X${j + 1}": 0,`;
+      tempVariableCountList.push(`X${j + 1}`);
+    }
+    this.variablesCountList = tempVariableCountList;
+    operationEquationTemplate = equationTemplate;
+    operationEquationTemplate += `"type":"${this.simplexType.substring(
+      0,
+      3
+    )} Z: "}`;
+    equationTemplate += '"op": "=",';
+    equationTemplate += '"result": 0';
+    equationTemplate += '}';
+
+    this.operationEquation = JSON.parse(operationEquationTemplate);
+    let tempArrayEq = []
+    for (let i = 0; i < this.restrictionsCount; i++) {
+      tempArrayEq.push(JSON.parse(equationTemplate));
+    }
+    this.equations = tempArrayEq;
+
+    this.showGeneratedFields = true;
   }
 
   startSimplex() {
@@ -90,7 +102,38 @@ export class SimplexTwoFasesComponent implements OnInit {
     }
   }
 
+  
+
   simplexProcess(method: string, rValue: number) {
+    let result = this.generateValues(method, rValue);
+    let
+      CXCJ = result[0],
+      UnUserMatrix = result[1],
+      ZjCj = result[2],
+      totalCountOfCol = result[3],
+      countTotalRows =  result[4],
+      R =  result[5],
+      H =  result[6],
+      S =  result[7],
+      newMethod =  result[8],
+      numberOfVariables = result[9];
+
+
+    this.DoProcess(
+      CXCJ,
+      this.initialMatrix,
+      ZjCj,
+      totalCountOfCol,
+      countTotalRows,
+      R,
+      H,
+      S,
+      method,
+      numberOfVariables
+    );
+  }
+
+  generateValues(method: string, rValue: number){
     this.initialMatrix = this.equations;
     this.faseOnePositionsR = [];
     this.faseOnePositionsX = [];
@@ -106,7 +149,10 @@ export class SimplexTwoFasesComponent implements OnInit {
     let R = 1;
     let H = 1;
     let S = 1;
-    for (let o = 0; o < this.variablesCount; o++) {
+    let numberOfVariables = 0;
+    numberOfVariables +=  this.variablesCount;
+
+    for (let o = 0; o < numberOfVariables; o++) {
       ZjCjText += `"X${o + 1}": 0,`;
       CxCjText += `"X${o + 1}": 0,`;
     }
@@ -163,7 +209,7 @@ export class SimplexTwoFasesComponent implements OnInit {
     ZjCjText += `"Z": 0}`;
     CXCJ = JSON.parse(CxCjText);
     ZjCj.push(JSON.parse(ZjCjText));
-    let totalCountOfCol = countNewVariables + this.variablesCount + 2;
+    let totalCountOfCol = countNewVariables + numberOfVariables + 2;
 
     console.log('CxCj y ZjCj respectivamente:'); // !to delete
     console.log(CXCJ); // !to delete
@@ -173,9 +219,9 @@ export class SimplexTwoFasesComponent implements OnInit {
     console.log('Matriz inicial'); // !to delete
     console.log(this.initialMatrix); // !to delete
 
-    this.visualListSetting(R, H, S);
+    this.visualListSetting(R, H, S, numberOfVariables);
 
-    this.DoProcess(
+    return [
       CXCJ,
       this.initialMatrix,
       ZjCj,
@@ -184,18 +230,19 @@ export class SimplexTwoFasesComponent implements OnInit {
       R,
       H,
       S,
-      method
-    );
+      method,
+      numberOfVariables
+    ]
   }
 
-  visualListSetting(R: number, H: number, S: number){
+  visualListSetting(R: number, H: number, S: number, numberOfVariables: number){
     this.XSs = []
     this.RSs = []
     this.HSs = []
     this.SSs = []
     this.positionToPrint = []
     
-    for (let i = 0; i < this.variablesCount; i++)
+    for (let i = 0; i < numberOfVariables; i++)
       this.XSs.push(`X${i + 1}`)
     for (let i = 0; i < R - 1; i++)
       this.RSs.push(`R${i + 1}`);
@@ -214,10 +261,11 @@ export class SimplexTwoFasesComponent implements OnInit {
     R: number,
     H: number,
     S: number,
-    method: string
+    method: string,
+    numberOfVariables: number
   ) {
     //Set a correct format to historyMatrix and initialCxCj
-    this.CleanMatrix(countTotalRows, CxCj, ZjCj, R, H,S);
+    this.CleanMatrix(countTotalRows, CxCj, ZjCj, R, H,S, numberOfVariables);
     this.firstMatrix = this.historyMatrix;
     for (let index = 0; index < countTotalRows; index++)
       this.faseOnePositionsX.push();
@@ -274,7 +322,7 @@ export class SimplexTwoFasesComponent implements OnInit {
 
     console.log("start two fases");    
     this.showFirstFase = true;
-    this.startTwoFases(totalCountOfCol, countTotalRows, startRows, endRows, H, S, method);
+    this.startTwoFases(totalCountOfCol, countTotalRows, startRows, endRows, H, S, method, numberOfVariables);
   }
 
   startTwoFases(
@@ -284,11 +332,12 @@ export class SimplexTwoFasesComponent implements OnInit {
     endRows: number,
     H: number,
     S: number,
-    method: string
+    method: string,
+    numberOfVariables: number
   ){
     this.twoFaseCxCj = [];
     this.twoFaseMatrix = [];
-    this.CleanFaseTwo(totalCountOfCol, countTotalRows, startRows, endRows, H, S);
+    this.CleanFaseTwo(totalCountOfCol, countTotalRows, startRows, endRows, H, S, numberOfVariables);
 
     let result;
     startRows = 0;
@@ -470,14 +519,19 @@ export class SimplexTwoFasesComponent implements OnInit {
     endRows: number,
     H: number,
     S: number,
+    numberOfVariables: number
   ){
     console.log(`startRow ${startRows}, endRow${endRows}`); // !to delete 8 y 11
     let tempArray = [];
     //se forma el nuevo CxCj
-    for (let i = 0; i < this.variablesCount; i++) {
+    for (let i = 0; i < numberOfVariables; i++) {
       tempArray.push(this.operationEquation[`X${i+1}`]);
     }
-    for (let i = tempArray.length - 1; i < this.initialCxCj.length; i++) {
+    console.log(`CxCj - R ${this.initialCxCj.length} - ${this.faseOnePositionsR.length} = ${this.initialCxCj.length - this.faseOnePositionsR.length}`);
+    console.log(`temp +1 ${tempArray.length - 1}`);
+    
+    
+    for (let i = tempArray.length - 1; i < this.initialCxCj.length - this.faseOnePositionsR.length -1; i++) {
       if(!this.faseOnePositionsR.includes(i)){
         tempArray.push(this.initialCxCj[i])
       }
@@ -525,7 +579,8 @@ export class SimplexTwoFasesComponent implements OnInit {
       ZjCj: any,
       R: number,
       H: number,
-      S: number
+      S: number,
+      numberOfVariables: number
     ){
     this.historyMatrix = [];
     this.tempArray = []
@@ -535,7 +590,7 @@ export class SimplexTwoFasesComponent implements OnInit {
     }
     //add X's
     for (let i = 0; i < this.initialMatrix.length; i++) {
-      for (let j = 0; j < this.variablesCount; j++) {
+      for (let j = 0; j < numberOfVariables; j++) {
         this.historyMatrix[i].push(this.initialMatrix[i][`X${j+1}`]);
         if(i == 0)
           this.tempArray.push(CxCj[`X${j+1}`]);        
@@ -606,12 +661,23 @@ export class SimplexTwoFasesComponent implements OnInit {
     var rounded = Math.round((numb + Number.EPSILON) * 100) / 100;
     return rounded;
   }
+  Charge(event: any){
+    if (
+      this.simplexType != 'default' &&
+      this.variablesCount > 1 &&
+      this.variablesCount != undefined &&
+      this.restrictionsCount > 1 &&
+      this.restrictionsCount != undefined
+    ) {
+      this.chargeOnChange();
+    }
+  }
   validations() {
     if (
       this.simplexType == 'default' ||
-      this.variablesCount == 0 ||
+      this.variablesCount <= 1 ||
       this.variablesCount == undefined ||
-      this.restrictionsCount == 0 ||
+      this.restrictionsCount <= 1 ||
       this.restrictionsCount == undefined
     ) {
       this._utils.openSnackBarError(

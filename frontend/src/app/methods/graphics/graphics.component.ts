@@ -12,7 +12,7 @@ export class GraphicsComponent implements OnInit {
   //first form variables
   simplexType: string = 'Minimización'; //default
   variablesCount: number = 2;
-  restrictionsCount: number = 4; //0
+  restrictionsCount: number = 0; //0
   operationEquation: any = {};
   restrictionPoints: any = [];
 

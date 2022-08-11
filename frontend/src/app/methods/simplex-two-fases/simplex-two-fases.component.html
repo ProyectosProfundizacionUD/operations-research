@@ -20,6 +20,8 @@
     <mat-form-field appearance="fill" class="w-100">
       <mat-label>Variables</mat-label>
       <input
+        (keyup)="Charge($event)"
+        (change)="Charge($event)"
         type="number"
         min="0"
         max="100"
@@ -34,6 +36,8 @@
     <mat-form-field appearance="fill" class="w-100">
       <mat-label>Restricciones</mat-label>
       <input
+        (keyup)="Charge($event)"
+        (change)="Charge($event)"
         type="number"
         min="0"
         max="100"
@@ -97,7 +101,7 @@
           <td>
             <mat-form-field appearance="fill" class="w-100">
               <mat-label>Operacion</mat-label>
-              <mat-select [(ngModel)]="equation.op">
+              <mat-select [(ngModel)]="equation.op" (valueChange)="simplexType == 'Minimización' ?  this.generateValues('min', 1) :  this.generateValues('max', -1);">
                 <mat-option
                   *ngFor="let opSelected of ['=', '≤', '≥']"
                   [value]="opSelected"
