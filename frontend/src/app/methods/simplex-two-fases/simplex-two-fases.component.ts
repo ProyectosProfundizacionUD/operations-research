@@ -38,7 +38,8 @@ export class SimplexTwoFasesComponent implements OnInit {
   HSs: any = [];
   rowSize: number = 0;
   positionToPrint: any = [];
-
+  //limit
+  limitOfFases: number = 40;
 
   tempArray: any = [];
 
@@ -82,6 +83,11 @@ export class SimplexTwoFasesComponent implements OnInit {
       tempArrayEq.push(JSON.parse(equationTemplate));
     }
     this.equations = tempArrayEq;
+
+    console.log("ecuaciones");    
+    console.log(this.equations);
+    console.log("operationEquations");    
+    console.log(this.operationEquation);
 
     this.showGeneratedFields = true;
   }
@@ -269,10 +275,11 @@ export class SimplexTwoFasesComponent implements OnInit {
     this.firstMatrix = this.historyMatrix;
     for (let index = 0; index < countTotalRows; index++)
       this.faseOnePositionsX.push();
-
+      
     console.log("initialCxCj");     // !to delete
     console.log(this.initialCxCj);  // !to delete
-    
+      
+    let whileCount = 0;
     let result;
     let startRows = 0;
     let endRows = countTotalRows;
@@ -312,8 +319,14 @@ export class SimplexTwoFasesComponent implements OnInit {
         endRows +=  countTotalRows + 1;
       } 
       console.log(result[0]);
-          
-    } while (result[0] == false);    
+      whileCount += 1;
+      console.log(`number of cicles fase 1: ${whileCount}`);
+      if(whileCount >= this.limitOfFases){
+        result[0] = true;
+        console.log("se ha detenido la ejecución del cliclo 1 para evitar romper el programa");        
+      }
+        
+    } while (result[0] == false);
     console.log("fase 1 complete"); // !to delete
     console.log("Posiciones de R a suprimir"); // !to delete
     console.log(this.faseOnePositionsR); // !to delete
@@ -340,6 +353,7 @@ export class SimplexTwoFasesComponent implements OnInit {
     this.CleanFaseTwo(totalCountOfCol, countTotalRows, startRows, endRows, H, S, numberOfVariables);
 
     let result;
+    let whileCount = 0;
     startRows = 0;
     endRows = countTotalRows;
     totalCountOfCol = totalCountOfCol - this.faseOnePositionsR.length;
@@ -379,7 +393,13 @@ export class SimplexTwoFasesComponent implements OnInit {
         endRows +=  countTotalRows + 1;
       } 
       console.log(result[0]);
+      whileCount += 1;
       // * end modify
+      console.log(`number of cicles fase 2: ${whileCount}`);
+      if(whileCount >= this.limitOfFases){
+        result[0] = true;
+        console.log("se ha detenido la ejecución del cliclo 1 para evitar romper el programa");        
+      }
     } while (result[0] == false);
     this.rowSize = countTotalRows;
     console.log("endProcess");
@@ -531,7 +551,7 @@ export class SimplexTwoFasesComponent implements OnInit {
     console.log(`temp +1 ${tempArray.length - 1}`);
     
     
-    for (let i = tempArray.length - 1; i < this.initialCxCj.length - this.faseOnePositionsR.length -1; i++) {
+    for (let i = tempArray.length; i < this.initialCxCj.length; i++) {
       if(!this.faseOnePositionsR.includes(i)){
         tempArray.push(this.initialCxCj[i])
       }
